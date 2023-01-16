@@ -15,6 +15,7 @@ struct cmd_arguments
     std::filesystem::path ground_truth_file_path{};
     uint32_t query_num{}; // TODO find suitable defaults
     uint32_t query_len{};
+    uint32_t ref_num{};
     bool verbose_ids{false};
 };
 
@@ -33,21 +34,13 @@ void run_program(cmd_arguments const & args)
     seqan3::sequence_file_input<dna4_input_trait> fin{args.in_file_path};
     seqan3::sequence_file_output fout{args.out_file_path};
 
-    // get number of references in input file
-    uint32_t num_of_refs{0};
-    for (auto const & record : fin){
-        num_of_refs ++;
-    }
-
     // go through references take random start positions for matches
     uint32_t pos{0};
+    std::ofstream ground_truth_file(args.ground_truth_file_path, std::ios_base::trunc);
     for (auto const & [sequence, id, quality] : fin)
     {
-        //seqan3::debug_stream << "ID: " << id << '\n';
-        //seqan3::debug_stream << "Seq: " << sequence << '\n';
-        
         pos ++;
-        uint32_t num_of_matches_per_record = pos <= args.query_num % num_of_refs ? args.query_num / num_of_refs + 1 : args.query_num / num_of_refs;
+        uint32_t num_of_matches_per_record = pos <= args.query_num % args.ref_num ? args.query_num / args.ref_num + 1 : args.query_num / args.ref_num;
 
         uint64_t const reference_length = std::ranges::size(sequence);
         std::uniform_int_distribution<uint64_t> match_start_dis(0, reference_length - args.query_len);
@@ -58,11 +51,11 @@ void run_program(cmd_arguments const & args)
             uint64_t const match_start_pos = match_start_dis(gen);
             std::vector<seqan3::dna4> match = sequence |
                                               seqan3::views::slice(match_start_pos, match_start_pos + args.query_len) |
-                                              seqan3::views::to<std::vector>;
+                                              seqan3::ranges::to<std::vector>();
 
             // write matches to output file
             std::vector<seqan3::phred42> const quality(args.query_len, seqan3::assign_rank_to(40u, seqan3::phred42{}));
-            std::string match_id = std::to_string(current_match_number);
+            std::string match_id = id + "_" + std::to_string(current_match_number);
             std::string meta_info{};
 
             if (args.verbose_ids)
@@ -77,19 +70,18 @@ void run_program(cmd_arguments const & args)
         }
 
         // write matches to corresponding reference ID in ground truth file
-        std::ofstream ground_truth_file(args.ground_truth_file_path);
-        if (ground_truth_file.is_open()){
-            ground_truth_file << id; // reference id
-            for (auto & const elem : matches_per_record)
-            {
-                ground_truth_file << "," + elem; // match ids
-            }
-            ground_truth_file << "\n";
+        ground_truth_file << id; // reference id
+        for (auto & elem : matches_per_record)
+        {
+            ground_truth_file << "," + elem; // match ids
         }
+        ground_truth_file << "\n";
     }
+    ground_truth_file.close();
 // TODO: maybe it should be possible to have matches mapping to multiple references
 // for that a script that inserts matches in references should be written
 // the groundtruth needs to be adjusted accordingly
+// TODO2: maybe randomly skip some references, so that some references do not have matches
 }
 
 void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments & args)
@@ -133,6 +125,12 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
                       'l',
                       "len_of_queries",
                       "Please provide the length that the generated query sequences should have.");
+
+    parser.add_option(args.ref_num,
+                      'r',
+                      "num_of_references",
+                      "Please provide the number of reference sequences in the input file");
+
     parser.add_flag(args.verbose_ids,
                      'v',
                      "verbose-ids",

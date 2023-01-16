@@ -6,7 +6,7 @@ num_of_refseqs = config["num_of_refseqs"]
 
 rule all:
     input:
-        ref_seqs = "results/ref_seqs_dna.fasta"
-        #query_seqs = # path to generated q seqs with wildcards
+        queries = "results/query_seqs.fasta",
+        ground_truth = "results/ground_truth.txt"
 
 include: "rules/simulate.smk"

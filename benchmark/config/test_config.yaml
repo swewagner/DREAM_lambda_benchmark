@@ -3,4 +3,4 @@ query_read_length: 200
 ref_seq_length: 10000
 
 num_of_qseqs: 500
-num_of_refseqs: 10
+num_of_refseqs: 100

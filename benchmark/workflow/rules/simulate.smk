@@ -11,12 +11,11 @@ rule simulate_queries:
     input:
         ref = "results/ref_seqs_dna.fasta"
     output:
-        queries = "results/query_seqs.fasta"
+        queries = "results/query_seqs.fasta",
+        ground_truth = "results/ground_truth.txt"
     shell:
-        "./workflow/scripts/simulate_queries.sh {input.ref} {output.queries} {num_of_qseqs} {query_read_len}"
-## TODO write script that takes random chunks of ref sequences
-## simulate_queries should use a c++ binary
-## write ground truth? should every query match? yes -> #queries = matches
+        "./workflow/scripts/simulate_queries.sh {input.ref} {output.queries} {output.ground_truth} {num_of_qseqs} {query_read_len}  {num_of_refseqs}"
+
 #
 #
 #rule translate_ref:
