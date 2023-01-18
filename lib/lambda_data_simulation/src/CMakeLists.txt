@@ -10,3 +10,7 @@ find_package (seqan3 3.0 REQUIRED)
 # build app with seqan3
 add_executable (generate_query_matches generate_query_matches.cpp)
 target_link_libraries (generate_query_matches seqan3::seqan3)
+
+# build app with seqan3
+add_executable (translate_ref translate_ref.cpp)
+target_link_libraries (translate_ref seqan3::seqan3)

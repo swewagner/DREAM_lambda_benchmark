@@ -16,12 +16,10 @@ rule simulate_queries:
     shell:
         "./workflow/scripts/simulate_queries.sh {input.ref} {output.queries} {output.ground_truth} {num_of_qseqs} {query_read_len}  {num_of_refseqs}"
 
-#
-#
-#rule translate_ref:
-#    input:
-#        dna = "results/ref_seqs_dna.fasta"
-#    output:
-#        prot = "results/ref_seqs_prot.fasta"
-#    shell:
-#        "../scripts/translate_ref.sh {input.dna} {output.prot}"
+rule translate_ref:
+    input:
+        dna = "results/ref_seqs_dna.fasta"
+    output:
+        prot = "results/ref_seqs_prot.fasta"
+    shell:
+        "./workflow/scripts/translate_ref.sh {input.dna} {output.prot}"
