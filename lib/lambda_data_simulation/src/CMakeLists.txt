@@ -1,16 +1,34 @@
-cmake_minimum_required (VERSION 3.4)
-project (generate_query_matches CXX)
- 
-# add seqan3 to search path
-list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../seqan3/build_system")
- 
-# require seqan3 with a version between >=3.0.0 and <4.0.0
-find_package (seqan3 3.0 REQUIRED)
- 
-# build app with seqan3
-add_executable (generate_query_matches generate_query_matches.cpp)
-target_link_libraries (generate_query_matches seqan3::seqan3)
+cmake_minimum_required(VERSION 3.7...3.25)
 
-# build app with seqan3
-add_executable (translate_ref translate_ref.cpp)
-target_link_libraries (translate_ref seqan3::seqan3)
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+ 
+set (mason2_args ${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS})
+list (APPEND mason2_args "-DSEQAN_BUILD_SYSTEM=APP:mason2")
+
+include (ExternalProject)
+ExternalProject_Add (
+    mason2
+    PREFIX mason2
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/seqan"
+    CMAKE_ARGS "${mason2_args}"
+    INSTALL_COMMAND ""
+)
+unset (mason2_args)
+
+ExternalProject_Get_property(mason2 BINARY_DIR)
+install(DIRECTORY "${BINARY_DIR}/bin/" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" USE_SOURCE_PERMISSIONS)
+
+# add seqan3 as interface
+add_library (common_interface INTERFACE)
+target_link_libraries ("common_interface" INTERFACE seqan3::seqan3)
+target_include_directories ("common_interface" INTERFACE ../include)
+ 
+# build app generate_query_matches with seqan3
+add_executable ("generate_query_matches" generate_query_matches.cpp)
+target_link_libraries ("generate_query_matches" "common_interface")
+
+# build app translate_ref with seqan3
+add_executable ("translate_ref" translate_ref.cpp)
+target_link_libraries ("translate_ref" "common_interface")
