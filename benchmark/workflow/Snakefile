@@ -6,8 +6,7 @@ num_of_refseqs = config["num_of_refseqs"]
 
 rule all:
     input:
-        queries = "results/query_seqs.fasta",
-        ground_truth = "results/ground_truth.txt",
-        prot_ref = "results/ref_seqs_prot.fasta"
+        "results/lambda_out.m8"
 
 include: "rules/simulate.smk"
+include: "rules/lambda.smk"
