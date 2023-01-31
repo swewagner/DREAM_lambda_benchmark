@@ -7,7 +7,7 @@ endif()
 ## CUSTOMISE
 
 # Define the application name and version.
-project(lambda_data_simulation VERSION 1.0
+project(Dream_lambda_benchmark VERSION 1.0
                   DESCRIPTION "A project to benchmark lambda like approaches"
                   LANGUAGES CXX)
 
@@ -49,5 +49,16 @@ list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAK
 list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
 list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 
-add_subdirectory (src)
+# Dependancy: Lambda
+include (ExternalProject)
+ExternalProject_Add (
+    lambda3
+    PREFIX lambda
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/lambda"
+    CMAKE_ARGS "${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS}"
+    INSTALL_COMMAND ""
+)
+
+add_subdirectory (lib/lambda_data_simulation/src)
+
 message (STATUS "${FontBold}You can run `make` to build the application.${FontReset}")

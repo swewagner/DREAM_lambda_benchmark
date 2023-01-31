@@ -1,6 +1,10 @@
 [submodule "lib/seqan3"]
-	path = lib/lambda_data_simulation/extern/seqan3
+	path = extern/seqan3
 	url = https://github.com/seqan/seqan3.git
 [submodule "lib/seqan"]
-	path = lib/lambda_data_simulation/extern/seqan
+	path = extern/seqan
 	url = https://github.com/seqan/seqan.git
+[submodule "lib/lambda_data_simulation/extern/lambda"]
+	path = extern/lambda
+	url = https://github.com/seqan/lambda.git
+	branch = lambda3

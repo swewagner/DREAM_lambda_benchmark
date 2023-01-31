@@ -2,6 +2,6 @@ benchmark/.snakemake
 benchmark/results/*
 benchmark/logs/*
 
-lib/lambda_data_simulation/build/*
+build/*
 
 .vscode
