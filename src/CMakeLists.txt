@@ -3,22 +3,6 @@ cmake_minimum_required(VERSION 3.7...3.25)
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
- 
-set (mason2_args ${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS})
-list (APPEND mason2_args "-DSEQAN_BUILD_SYSTEM=APP:mason2")
-
-include (ExternalProject)
-ExternalProject_Add (
-    mason2
-    PREFIX mason2
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/seqan"
-    CMAKE_ARGS "${mason2_args}"
-    INSTALL_COMMAND ""
-)
-unset (mason2_args)
-
-ExternalProject_Get_property(mason2 BINARY_DIR)
-install(DIRECTORY "${BINARY_DIR}/bin/" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" USE_SOURCE_PERMISSIONS)
 
 # add seqan3 as interface
 add_library (common_interface INTERFACE)

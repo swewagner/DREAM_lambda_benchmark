@@ -4,7 +4,7 @@ set -e
 OUT_FILE=$1
 NUM=$2
 LEN=$3
-BINARY_DIR="../lib/lambda_data_simulation/build/src/mason2/src/mason2-build/bin"
+BINARY_DIR="../build/mason2/src/mason2-build/bin"
 
 truncate -s 0 $OUT_FILE
 

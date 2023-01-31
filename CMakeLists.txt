@@ -20,9 +20,7 @@ if (NOT CMAKE_BUILD_TYPE)
          FORCE)
 endif ()
 
-# Specify the directories where to store the built archives, libraries and executables
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+# Specify the directories where to store  executables
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Messages
@@ -49,6 +47,20 @@ list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAK
 list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
 list (APPEND APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 
+# Dependancy: Mason2
+set (mason2_args ${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS})
+list (APPEND mason2_args "-DSEQAN_BUILD_SYSTEM=APP:mason2")
+
+include (ExternalProject)
+ExternalProject_Add (
+    mason2
+    PREFIX mason2
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/seqan"
+    CMAKE_ARGS "${mason2_args}"
+    INSTALL_COMMAND ""
+)
+unset (mason2_args)
+
 # Dependancy: Lambda
 include (ExternalProject)
 ExternalProject_Add (
@@ -59,6 +71,7 @@ ExternalProject_Add (
     INSTALL_COMMAND ""
 )
 
-add_subdirectory (lib/lambda_data_simulation/src)
+# own scripts
+add_subdirectory (src)
 
 message (STATUS "${FontBold}You can run `make` to build the application.${FontReset}")

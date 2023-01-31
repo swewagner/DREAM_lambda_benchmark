@@ -7,7 +7,7 @@ TRUTH_FILE=$3
 NUM=$4
 LEN=$5
 R_NUM=$6
-BINARY_DIR="../lib/lambda_data_simulation/build/bin"
+BINARY_DIR="../build/bin"
 
 $BINARY_DIR/generate_query_matches --in $IN_FILE \
                                    --out $OUT_FILE \
