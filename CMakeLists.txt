@@ -65,7 +65,7 @@ unset (mason2_args)
 include (ExternalProject)
 ExternalProject_Add (
     lambda3
-    PREFIX lambda
+    PREFIX lambda3
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/lambda"
     CMAKE_ARGS "${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS}"
     INSTALL_COMMAND ""

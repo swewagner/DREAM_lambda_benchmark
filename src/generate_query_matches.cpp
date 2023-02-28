@@ -16,6 +16,7 @@ struct cmd_arguments
     uint32_t query_num{}; // TODO find suitable defaults
     uint32_t query_len{};
     uint32_t ref_num{};
+    double max_error_rate{0.01};
     bool verbose_ids{false};
 };
 
@@ -48,10 +49,25 @@ void run_program(cmd_arguments const & args)
 
         for (uint32_t current_match_number = 0; current_match_number < num_of_matches_per_record; ++current_match_number)
         {
+            // extract match
             uint64_t const match_start_pos = match_start_dis(gen);
             std::vector<seqan3::dna4> match = sequence |
                                               seqan3::views::slice(match_start_pos, match_start_pos + args.query_len) |
                                               seqan3::ranges::to<std::vector>();
+
+            // introduce errors
+            uint32_t max_errors = (int) (args.query_len * args.max_error_rate);
+            std::uniform_int_distribution<uint32_t> match_error_pos_dis(0, args.query_len -1);
+            std::uniform_int_distribution<uint8_t> dna4_rank_dis(0, 3);
+            for (uint8_t error_count = 0; error_count < max_errors; ++error_count)
+            {
+                uint32_t const error_pos = match_error_pos_dis(gen);
+                seqan3::dna4 const current_base = match[error_pos];
+                seqan3::dna4 new_base = current_base;
+                while (new_base == current_base)
+                    seqan3::assign_rank_to(dna4_rank_dis(gen), new_base);
+                match[error_pos] = new_base;
+            }
 
             // write matches to output file
             std::vector<seqan3::phred42> const quality(args.query_len, seqan3::assign_rank_to(40u, seqan3::phred42{}));
@@ -64,6 +80,7 @@ void run_program(cmd_arguments const & args)
                 meta_info += "reference_file='" + std::string{args.in_file_path} + "'";
                 meta_info += ", reference_id='" + id + "'";
                 meta_info += ", start_position=" + std::to_string(match_start_pos);
+                meta_info += ", errors=" + std::to_string(max_errors);
             }
             fout.emplace_back(match, match_id + meta_info, quality);
             matches_per_record.push_back(match_id);
@@ -90,7 +107,7 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
     parser.info.app_name = "generate_query_matches";
     parser.info.author = "Swenja Wagner";
     parser.info.email = "swenja.wagner@fu-berlin.de";
-    parser.info.date = "12.12.2022";
+    parser.info.date = "28.02.2023";
     parser.info.short_description = "generating query matches from given references";
     parser.info.version = "0.0.1";
     // parser.info.examples = {}
@@ -130,6 +147,11 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
                       'r',
                       "num_of_references",
                       "Please provide the number of reference sequences in the input file");
+    
+    parser.add_option(args.max_error_rate,
+                      'e',
+                      "max_error_rate",
+                      "Please provide the max error rate for a query");
 
     parser.add_flag(args.verbose_ids,
                      'v',

@@ -7,6 +7,7 @@ TRUTH_FILE=$3
 NUM=$4
 LEN=$5
 R_NUM=$6
+ERR_RATE=$7
 BINARY_DIR="../build/bin"
 
 $BINARY_DIR/generate_query_matches --in $IN_FILE \
@@ -15,4 +16,5 @@ $BINARY_DIR/generate_query_matches --in $IN_FILE \
                                    --num_of_queries $NUM \
                                    --len_of_queries $LEN \
                                    --num_of_references $R_NUM \
+                                   --max_error_rate $ERR_RATE\
                                    &> /dev/null

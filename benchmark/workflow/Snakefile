@@ -4,9 +4,11 @@ ref_seq_len = config["ref_seq_length"]
 num_of_qseqs = config["num_of_qseqs"]
 num_of_refseqs = config["num_of_refseqs"]
 
+error_rates = [0, 0.025, 0.05, 0.075, 0.1]
+
 rule all:
     input:
-        "results/lambda_out.m8"
+        expand("results/er_{er}/lambda_out.m8", er=error_rates)
 
 include: "rules/simulate.smk"
 include: "rules/lambda.smk"
