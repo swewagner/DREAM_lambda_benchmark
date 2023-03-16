@@ -14,7 +14,7 @@ struct cmd_arguments
     std::filesystem::path out_file_path{};
     std::filesystem::path ground_truth_file_path{};
     uint32_t query_num{}; // TODO find suitable defaults
-    uint32_t query_len{};
+    uint32_t match_len{};
     uint32_t ref_num{};
     double max_error_rate{0.01};
     bool verbose_ids{false};
@@ -44,7 +44,7 @@ void run_program(cmd_arguments const & args)
         uint32_t num_of_matches_per_record = pos <= args.query_num % args.ref_num ? args.query_num / args.ref_num + 1 : args.query_num / args.ref_num;
 
         uint64_t const reference_length = std::ranges::size(sequence);
-        std::uniform_int_distribution<uint64_t> match_start_dis(0, reference_length - args.query_len);
+        std::uniform_int_distribution<uint64_t> match_start_dis(0, reference_length - args.match_len);
         std::vector<std::string> matches_per_record{};
 
         for (uint32_t current_match_number = 0; current_match_number < num_of_matches_per_record; ++current_match_number)
@@ -52,12 +52,12 @@ void run_program(cmd_arguments const & args)
             // extract match
             uint64_t const match_start_pos = match_start_dis(gen);
             std::vector<seqan3::dna4> match = sequence |
-                                              seqan3::views::slice(match_start_pos, match_start_pos + args.query_len) |
+                                              seqan3::views::slice(match_start_pos, match_start_pos + args.match_len) |
                                               seqan3::ranges::to<std::vector>();
 
             // introduce errors
-            uint32_t max_errors = (int) (args.query_len * args.max_error_rate);
-            std::uniform_int_distribution<uint32_t> match_error_pos_dis(0, args.query_len -1);
+            uint32_t max_errors = (int) (args.match_len * args.max_error_rate);
+            std::uniform_int_distribution<uint32_t> match_error_pos_dis(0, args.match_len -1);
             std::uniform_int_distribution<uint8_t> dna4_rank_dis(0, 3);
             for (uint8_t error_count = 0; error_count < max_errors; ++error_count)
             {
@@ -70,7 +70,7 @@ void run_program(cmd_arguments const & args)
             }
 
             // write matches to output file
-            std::vector<seqan3::phred42> const quality(args.query_len, seqan3::assign_rank_to(40u, seqan3::phred42{}));
+            std::vector<seqan3::phred42> const quality(args.match_len, seqan3::assign_rank_to(40u, seqan3::phred42{}));
             std::string match_id = id + "_" + std::to_string(current_match_number);
             std::string meta_info{};
 
@@ -105,11 +105,11 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
 {
     // add meta data
     parser.info.app_name = "generate_query_matches";
-    parser.info.author = "Swenja Wagner";
-    parser.info.email = "swenja.wagner@fu-berlin.de";
-    parser.info.date = "28.02.2023";
+    // parser.info.author = "Swenja Wagner";
+    // parser.info.email = "swenja.wagner@fu-berlin.de";
+    // parser.info.date = "28.02.2023";
     parser.info.short_description = "generating query matches from given references";
-    parser.info.version = "0.0.1";
+    // parser.info.version = "0.0.1";
     // parser.info.examples = {}
 
     // add options/flags
@@ -138,10 +138,10 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
                       "num_of_queries",
                       "Please provide the number of query sequences, that should be generated");
 
-    parser.add_option(args.query_len,
+    parser.add_option(args.match_len,
                       'l',
-                      "len_of_queries",
-                      "Please provide the length that the generated query sequences should have.");
+                      "len_of_match",
+                      "Please provide the length that the generated match in the query sequence should have.");
 
     parser.add_option(args.ref_num,
                       'r',
@@ -162,7 +162,7 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
 int main(int argc, char ** argv)
 {
     // initialize parser
-    seqan3::argument_parser command_line_parser{"query_generation_parsing", argc, argv};
+    seqan3::argument_parser command_line_parser{"match_generation_parsing", argc, argv};
     cmd_arguments args{};
 
     initialize_argument_parser(command_line_parser, args);

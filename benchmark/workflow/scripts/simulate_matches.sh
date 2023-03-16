@@ -14,7 +14,7 @@ $BINARY_DIR/generate_query_matches --in $IN_FILE \
                                    --out $OUT_FILE \
                                    --ground_truth $TRUTH_FILE \
                                    --num_of_queries $NUM \
-                                   --len_of_queries $LEN \
+                                   --len_of_match $LEN \
                                    --num_of_references $R_NUM \
                                    --max_error_rate $ERR_RATE\
                                    &> /dev/null

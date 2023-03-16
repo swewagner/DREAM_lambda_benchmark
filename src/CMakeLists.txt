@@ -13,6 +13,10 @@ target_include_directories ("common_interface" INTERFACE ../include)
 add_executable ("generate_query_matches" generate_query_matches.cpp)
 target_link_libraries ("generate_query_matches" "common_interface")
 
+# build app insert_query_matches with seqan3
+add_executable ("insert_query_matches" insert_query_matches.cpp)
+target_link_libraries ("insert_query_matches" "common_interface")
+
 # build app translate_ref with seqan3
 add_executable ("translate_ref" translate_ref.cpp)
 target_link_libraries ("translate_ref" "common_interface")

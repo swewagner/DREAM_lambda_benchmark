@@ -1,6 +1,9 @@
 # in bases
 query_read_length: 200
 ref_seq_length: 9999
+match_length: 100
 
 num_of_qseqs: 500
 num_of_refseqs: 100
+
+num_of_bins: 8
