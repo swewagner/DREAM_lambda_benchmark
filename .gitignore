@@ -3,5 +3,7 @@ benchmark/results/*
 benchmark/logs/*
 
 build/*
+out/*
+lib/*
 
 .vscode

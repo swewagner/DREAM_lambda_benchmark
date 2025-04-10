@@ -14,9 +14,16 @@ bin_ids = [str(x).zfill(2) for x in bins]
 
 rule all:
     input:
-        prot = "results/ref_seqs_prot.fasta",
-        bins = expand("results/bins/bin_{bin_id}.fasta", bin_id=bin_ids),
-        queries = expand("results/er_{er}/final_queries.fasta", er=error_rates)
+        prot = "results/queries_prot.fasta",
+        #bins = expand("results/er_{er}/bins/bin_00.fasta", bin_id=bin_ids, er=error_rates),
+        bin_paths = expand("results/er_{er}/all_bin_paths.txt", er=error_rates),
+        #queries = expand("results/er_{er}/final_queries.fasta", er=error_rates),
+        #binfile = "results/all_bin_paths.txt"
+        #valik_out = expand("results/er_{er}/search.gff", er=error_rates),
+        #lambda_db = expand("results/er_{er}/dbs/db_{bin_id}.lba", er=error_rates, bin_id=bin_ids)
+        lambda_out = expand("results/er_{er}/lambda_out/lambda_out_{bin_id}.m8", er=error_rates, bin_id=bin_ids)
 
-include: "rules/simulate.smk"
+#include: "rules/simulate.smk"
+#include: "rules/valik.smk"
+include: "rules/simulate2.smk"
 include: "rules/lambda.smk"

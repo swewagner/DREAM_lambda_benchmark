@@ -1,18 +1,9 @@
 rule simulate_ref_dna:
     output:
-        ref = "results/ref_seqs_dna_linebreaks.fasta"
+        ref = "results/ref_seqs_dna.fasta"
     shell:
         "./workflow/scripts/simulate_seq.sh {output.ref} {num_of_refseqs} {ref_seq_len}"
 
-rule remove_linebreaks_ref:
-    input:
-        "results/ref_seqs_dna_linebreaks.fasta"
-    output:
-        "results/ref_seqs_dna.fasta"
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/remove_linebreaks.py"
 
 rule simulate_query_pre:
     output:
@@ -40,6 +31,7 @@ rule insert_matches:
     shell:
         "./workflow/scripts/insert_matches.sh {input.queries} {input.matches} {output}"
 
+
 rule remove_linebreaks:
     input:
         queries = "results/er_{er}/final_queries_linebreaks.fasta"
@@ -59,6 +51,7 @@ rule translate_ref:
     shell:
         "./workflow/scripts/translate_ref.sh {input.dna} {output.prot}"
 
+
 rule remove_linebreaks_prot:
     input:
         "results/ref_seqs_prot_linebreaks.fasta"
@@ -69,6 +62,7 @@ rule remove_linebreaks_prot:
     script:
         "../scripts/remove_linebreaks.py"
 
+
 rule split_into_bins:
     input:
         ref = "results/ref_seqs_dna.fasta"
@@ -78,6 +72,7 @@ rule split_into_bins:
         "../envs/python.yaml"
     script:
         "../scripts/split_into_bins.py"
+
 
 rule remove_linebreaks_in_bins:
     input:

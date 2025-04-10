@@ -29,7 +29,8 @@ set (FontBold "${Esc}[1m")
 set (FontReset "${Esc}[m")
 
 # Dependency: SeqAn3.
-find_package (SeqAn3 QUIET REQUIRED HINTS extern/seqan3/build_system)
+set(SEQAN3_CLONE_DIR "${CMAKE_SOURCE_DIR}/extern/seqan3")
+find_package (SeqAn3 REQUIRED HINTS extern/seqan3/build_system)
 
 # Dependency: SeqAn
 # Note: includes seqan-config.cmake manually to have
@@ -64,8 +65,8 @@ unset (mason2_args)
 # Dependancy: Lambda
 include (ExternalProject)
 ExternalProject_Add (
-    lambda3
-    PREFIX lambda3
+    lambda
+    PREFIX lambda
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/extern/lambda"
     CMAKE_ARGS "${APP_TEMPLATE_EXTERNAL_PROJECT_CMAKE_ARGS}"
     INSTALL_COMMAND ""

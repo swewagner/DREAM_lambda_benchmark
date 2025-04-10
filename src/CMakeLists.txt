@@ -20,3 +20,7 @@ target_link_libraries ("insert_query_matches" "common_interface")
 # build app translate_ref with seqan3
 add_executable ("translate_ref" translate_ref.cpp)
 target_link_libraries ("translate_ref" "common_interface")
+
+# build app distribute_matches with seqan3
+add_executable ("distribute_matches" distribute_matches.cpp)
+target_link_libraries ("distribute_matches" "common_interface")
