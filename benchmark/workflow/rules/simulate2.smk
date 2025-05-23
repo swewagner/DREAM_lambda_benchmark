@@ -18,7 +18,7 @@ rule distribute_matches:
         pre_refs = "results/pre_ref_seqs_dna.fasta"
     output:
         ground_truth = "results/er_{er}/ground_truth.txt",
-        refs = "results/er_{er}/bins/bin_00.fasta"
+        refs = expand("results/er_{{er}}/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
     params:
         outdir = "results/er_{er}/bins"
     shell:
@@ -36,10 +36,11 @@ rule translate_qry:
 
 rule create_all_bin_paths:
     input:
-        refs = "results/er_{er}/bins"
+        refs = expand("results/er_{{er}}/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
     output:
         bin_paths = "results/er_{er}/all_bin_paths.txt"
     params:
-        ls_cmd = "bins/$output"
+        ls_cmd = "bins/$output",
+        bin_path = "results/er_{er}/bins"
     shell:
-        "for output in $(ls {input.refs}); do echo {params.ls_cmd} >> {output.bin_paths}; done"
+        "for output in $(ls {params.bin_path}); do echo {params.ls_cmd} >> {output.bin_paths}; done"
