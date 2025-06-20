@@ -221,7 +221,6 @@ void run_program(cmd_arguments const & args)
     for (int i = 0; i < bins.size(); i++)
     {
         std::string filename = "bin_" + std::to_string(i) + ".fasta";
-        if (i < 10) {filename = "bin_0" + std::to_string(i) + ".fasta";}
         std::filesystem::path out_file = args.ref_out_dir / filename;
         seqan3::sequence_file_output fout{out_file};
         for (auto & rec : bins[i])

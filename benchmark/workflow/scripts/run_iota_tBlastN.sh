@@ -11,8 +11,9 @@ BINARY_DIR="../build/iota"
 $BINARY_DIR/ibf_magic -r $BIN_FILE \
                         -q $QUERY_FILE \
                         -o $OUT_DIR \
-                        nucleotide \
-                        -M 2 \
+                        protein \
+                        -S auto \
+                        -Q auto \
                         &> $LOG_FILE
 
 touch $DUMMY_FILE

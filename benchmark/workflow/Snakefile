@@ -9,7 +9,8 @@ num_of_bins = config["num_of_bins"]
 
 error_rates = [0, 0.025, 0.05, 0.075, 0.1]
 bins = list(range(num_of_bins))
-bin_ids = [str(x).zfill(2) for x in bins]
+bin_ids = [str(x) for x in bins]
+blast_modes = ["blastN", "tBlastN"]
 
 
 rule all:
@@ -21,11 +22,13 @@ rule all:
         #binfile = "results/all_bin_paths.txt"
         #valik_out = expand("results/er_{er}/search.gff", er=error_rates),
         #lambda_db = expand("results/er_{er}/dbs/db_{bin_id}.lba", er=error_rates, bin_id=bin_ids)
-        lambda_out = expand("results/er_{er}/lambda_out/lambda_out_{bin_id}.m8", er=error_rates, bin_id=bin_ids),
-        iota = expand("results/er_{er}/iota/blastN/dummy.txt", er=error_rates)
+        lambda_out = expand("results/er_{er}/{blast_mode}/lambda/out_{bin_id}.m8", er=error_rates, bin_id=bin_ids, blast_mode=blast_modes),
+        iota = expand("results/er_{er}/{blast_mode}/benchmark/iota_groundtruth.txt", er=error_rates, blast_mode=blast_modes),
+        iota_lambda = expand("results/er_{er}/{blast_mode}/benchmark/iota_lambda.txt", er=error_rates, blast_mode=blast_modes)
 
 #include: "rules/simulate.smk"
 #include: "rules/valik.smk"
+include: "rules/benchmark.smk"
 include: "rules/simulate2.smk"
 include: "rules/lambda.smk"
 include: "rules/iota.smk"
