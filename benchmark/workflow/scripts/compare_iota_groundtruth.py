@@ -21,8 +21,6 @@ with open(gt_file) as gt:
             row = list(map(int, row))
             gt_dic.setdefault(row[0], set()).add(row[2])
 
-print(gt_dic)
-
 with open(results_file) as res:
     for line in res:
         hit = line.rstrip('\n').split(',')

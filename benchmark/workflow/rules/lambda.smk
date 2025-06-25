@@ -1,71 +1,105 @@
-# lambda without prefilter, but on each bin
-
-rule make_index_nuc:
+# lambda on whole database
+rule make_index:
     input:
-        db = "results/er_{er}/bins/bin_{bin_id}.fasta"
+        db = "results/er_{er}/ref_seqs.fasta",
+        bench = "benchmarks/lambda_index.time"
     output:
-        index = "results/er_{er}/lambda_nuc_dbs/db_{bin_id}.lba"
+        index = "results/er_{er}/lambda/nuc_db.lba"
+    params:
+        binary_dir = "../build/lambda3/src/lambda3-build/bin"
     log:
-        "logs/lambda/indexn_{er}/log_{bin_id}.log"
+        "logs/lambda/index/{er}/nuc.log"
     shell:
-        "./workflow/scripts/lambda_indexn.sh {input.db} {output.index} {log}"
+        """
+        /usr/bin/time -a -o {input.bench} -f "%e\t%M\t%x\tlambda-index\t{wildcards.er}" \
+        {params.binary_dir}/lambda3 mkindexn -d {input.db} -i {output.index} &> {log}
+        """
 
 
-rule search_nuc:
+rule search:
     input:
         query = "results/queries.fasta",
-        index = "results/er_{er}/lambda_nuc_dbs/db_{bin_id}.lba"
+        index = "results/er_{er}/lambda/nuc_db.lba",
+        bench = "benchmarks/lambda_search.time"
     output:
-        "results/er_{er}/blastN/lambda/out_{bin_id}.m8"
+        "results/er_{er}/lambda/blastN_search.m8"
+    params:
+        binary_dir = "../build/lambda3/src/lambda3-build/bin"
     log:
-        "logs/lambda/searchn_{er}/log_{bin_id}.log"
+        "logs/lambda/search/{er}/log_combined_blastN.log"
     shell:
-        "./workflow/scripts/lambda_searchn.sh {input.query} {input.index} {output} {log}"
+        """
+        /usr/bin/time -a -o {input.bench} -f "%e\t%M\t%x\tlambda-search\t{wildcards.er}" \
+        {params.binary_dir}/lambda3 searchn -q {input.query} -i {input.index} -o {output} &> {log}
+        """
 
 
-rule make_index_prot:
+# lambda without prefilter, but on each bin
+
+rule make_index_bins:
     input:
         db = "results/er_{er}/bins/bin_{bin_id}.fasta"
     output:
-        index = "results/er_{er}/lambda_prot_dbs/db_{bin_id}.lba"
+        index = "results/er_{er}/{blast_mode}/lambda/dbs/db_{bin_id}.lba"
     log:
-        "logs/lambda/indexp_{er}/log_{bin_id}.log"
+        "logs/lambda/index/{er}/{blast_mode}/log_{bin_id}.log"
     shell:
-        "./workflow/scripts/lambda_indexp.sh {input.db} {output.index} {log}"
+        "./workflow/scripts/lambda_index.sh {input.db} {output.index} {wildcards.blast_mode} {log}"
 
 
-rule search_prot:
+rule search_bins:
     input:
-        query = "results/queries_prot.fasta",
-        index = "results/er_{er}/lambda_prot_dbs/db_{bin_id}.lba"
+        query = "results/queries.fasta",
+        index = "results/er_{er}/{blast_mode}/lambda/dbs/db_{bin_id}.lba"
     output:
-        "results/er_{er}/tBlastN/lambda/out_{bin_id}.m8"
+        "results/er_{er}/{blast_mode}/lambda/out_{bin_id}.m8"
     log:
-        "logs/lambda/searchp_{er}/log_{bin_id}.log"
+        "logs/lambda/search/{er}/{blast_mode}/log_{bin_id}.log"
     shell:
-        "./workflow/scripts/lambda_searchp.sh {input.query} {input.index} {output} {log}"
+        "./workflow/scripts/lambda_search.sh {input.query} {input.index} {output} {wildcards.blast_mode} {log}"
 
 
-# lambda on bins found by iota
+rule make_index_sparse:
+    input:
+        db = "results/er_{er}/bins/bin_{sparse_id}.fasta",
+        bench = "benchmarks/lambda_sparse_index.time"
+    output:
+        index = "results/er_{er}/{blast_mode}/lambda/sparse_dbs/db_{sparse_id}.lba"
+    log:
+        "logs/lambda/index_sparse/{er}/{blast_mode}/log_{sparse_id}.log"
+    shell:
+        """
+        /usr/bin/time -a -o {input.bench} -f "%e\t%M\t%x\tlambda-sparse-index\t{wildcards.blast_mode}\t{wildcards.er}\t{wildcards.sparse_id}" \
+        ./workflow/scripts/lambda_index.sh {input.db} {output.index} {wildcards.blast_mode} {log}
+        """
+        
+def getQueryForSparseLambda(wildcards):
+    if wildcards.blast_mode == "blastN":
+        query = "results/er_{er}/{blast_mode}/iota/queries_bin_{sparse_id}.fasta"
+    else:
+        query = "results/er_{er}/{blast_mode}/iota/queries_prot_bin_{sparse_id}.fasta"
+    return query
 
-# rule make_index_sparse_nuc:
-#     input:
-#         db = "results/er_{er}/bins/bin_{sparse_bin_id}.fasta"
-#     output:
-#         index = "results/er_{er}/lambda_sparse_nuc_dbs/db_{sparse_bin_id}.lba"
-#     log:
-#         "logs/lambda/sparse/indexn_{er}/log_{sparse_bin_id}.log"
-#     shell:
-#         "./workflow/scripts/lambda_indexn.sh {input.db} {output.index} {log}"
+rule search_sparse:
+    input:
+        #query = "results/er_{er}/{blast_mode}/iota/queries_bin_{sparse_id}.fasta",
+        query = getQueryForSparseLambda,
+        index = "results/er_{er}/{blast_mode}/lambda/sparse_dbs/db_{sparse_id}.lba",
+        bench = "benchmarks/lambda_sparse_search.time"
+    output:
+        "results/er_{er}/{blast_mode}/lambda/sparse_out/out_{sparse_id}.m8"
+    log:
+        "logs/lambda/search_sparse/{er}/{blast_mode}/log_{sparse_id}.log"
+    shell:
+        """
+        /usr/bin/time -a -o {input.bench} -f "%e\t%M\t%x\tlambda-sparse-search\t{wildcards.blast_mode}\t{wildcards.er}\t{wildcards.sparse_id}" \
+        ./workflow/scripts/lambda_search.sh {input.query} {input.index} {output} {wildcards.blast_mode} {log}"""
 
 
-# rule search_sparse_nuc:
-#     input:
-#         query = "results/er_{er}/blastN/iota/queries_bin_{sparse_bin_id}.fasta",
-#         index = "results/er_{er}/lambda_sparse_nuc_dbs/db_{sparse_bin_id}.lba"
-#     output:
-#         "results/er_{er}/blastN/lambda_sparse/out_{sparse_bin_id}.m8"
-#     log:
-#         "logs/lambda/sparse/searchn_{er}/log_{sparse_bin_id}.log"
-#     shell:
-#         "./workflow/scripts/lambda_searchn.sh {input.query} {input.index} {output} {log}"
+rule extract_lambda_results_sparse:
+    input:
+        get_sparse_ids
+    output:
+        out = "results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt"
+    script:
+        "../scripts/lambda_summary.py"

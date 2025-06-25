@@ -40,7 +40,26 @@ rule create_all_bin_paths:
     output:
         bin_paths = "results/er_{er}/all_bin_paths.txt"
     params:
-        ls_cmd = "bins/$output",
-        bin_path = "results/er_{er}/bins"
+        max_bin = num_of_bins-1,
+        bin_path = "bins/bin_",
+        ext = ".fasta"
     shell:
-        "for output in $(ls {params.bin_path}); do echo {params.ls_cmd} >> {output.bin_paths}; done"
+        """
+        for i in $(seq 0 {params.max_bin}); do
+            echo {params.bin_path}$i{params.ext} >> {output.bin_paths}
+        done
+        """
+
+rule combine_bins_into_one_file:
+    input:
+        expand("results/er_{{er}}/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
+    output:
+        combined_bins = "results/er_{er}/ref_seqs.fasta"
+    params:
+        max_bin = num_of_bins-1,
+        bin_path = "results/er_{er}/bins/bin_",
+        ext = ".fasta"
+    shell:
+        """
+        for i in $(seq 0 {params.max_bin}); do cat {params.bin_path}$i{params.ext} >> {output.combined_bins}; done
+        """
