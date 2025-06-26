@@ -10,24 +10,26 @@ num_of_bins = config["num_of_bins"]
 error_rates = [0, 0.025, 0.05, 0.075, 0.1]
 bins = list(range(num_of_bins))
 bin_ids = [str(x) for x in bins]
-blast_modes = ["blastN", "tBlastN"]
+domains = ["nuc", "prot"]
+blast_modes = ["blastN", "tBlastN", "blastX", "blastP"]
 benchmark_file_names = ["lambda_index", "lambda_search", "lambda_sparse_index", "lambda_sparse_search", "iota"]
 
+def getQueryDomain(wildcards):
+    if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "blastX":
+        return "results/queries_nuc.fasta"
+    else:
+        return "results/queries_prot.fasta"
 
 rule all:
     input:
-        prot = "results/queries_prot.fasta",
+        #prot = "results/queries_prot.fasta",
         #bins = expand("results/er_{er}/bins/bin_{bin_id}.fasta", bin_id=bin_ids, er=error_rates),
-        bin_paths = expand("results/er_{er}/all_bin_paths.txt", er=error_rates),
-        #queries = expand("results/er_{er}/final_queries.fasta", er=error_rates),
-        #binfile = "results/all_bin_paths.txt"
-        #valik_out = expand("results/er_{er}/search.gff", er=error_rates),
-        #iota_lambda = expand("results/er_{er}/{blast_mode}/benchmark/iota_lambda.txt", er=error_rates, blast_mode=blast_modes),
-        #lambda_db = expand("results/er_{er}/dbs/db_{bin_id}.lba", er=error_rates, bin_id=bin_ids)
-        #lambda_out = expand("results/er_{er}/{blast_mode}/lambda/out_{bin_id}.m8", er=error_rates, bin_id=bin_ids, blast_mode=blast_modes),
-        iota = expand("results/er_{er}/{blast_mode}/iota/results.txt", er=error_rates, blast_mode=blast_modes),
-        sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt", er=error_rates, blast_mode=blast_modes),
-        combined_bins = expand("results/er_{er}/lambda/blastN_search.m8", er=error_rates)
+        #bin_paths = expand("results/er_{er}/{domain}/all_bin_paths.txt", er=error_rates, domain=domains),
+        #ref_seqs = expand("results/er_{er}/{domain}/ref_seqs.fasta", er=error_rates, domain=domains),
+        #iota = expand("results/er_{er}/{blast_mode}/iota/results.txt", er=error_rates, blast_mode=blast_modes)
+        #lambda_combined = expand("results/er_{er}/{blast_mode}/lambda/search_out.m8", er=error_rates, blast_mode=blast_modes)
+        #sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt", er=error_rates, blast_mode=blast_modes)
+        trues = expand("results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt", er=error_rates, blast_mode=blast_modes)
 
 
 #include: "rules/simulate.smk"

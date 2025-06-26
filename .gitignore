@@ -4,6 +4,7 @@ benchmark/logs/*
 benchmark/benchmarks/*
 
 build/*
+build_old/*
 out/*
 lib/*
 

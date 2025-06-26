@@ -1,16 +1,31 @@
+def getGroundTruthDomain(wildcards):
+    if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "tblastN":
+        return "results/er_{er}/nuc/ground_truth.txt"
+    else:
+        return "results/er_{er}/prot/ground_truth.txt"
+
 rule compare_iota_groundtruth:
     input:
-        ground_truth = "results/er_{er}/ground_truth.txt",
+        ground_truth = getGroundTruthDomain,
         iota_results = "results/er_{er}/{blast_mode}/iota/results.txt"
     output:
         out = "results/er_{er}/{blast_mode}/benchmark/iota_groundtruth.txt"
     script:
         "../scripts/compare_iota_groundtruth.py"
 
+rule compare_lambda_groundtruth:
+    input:
+        ground_truth = getGroundTruthDomain,
+        lambda_results = "results/er_{er}/{blast_mode}/lambda/results.txt"
+    output:
+        out = "results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt"
+    script:
+        "../scripts/compare_lambda_groundtruth.py"
+
 
 rule extract_lambda_results:
     input:
-        lambda_out = expand("results/er_{{er}}/{{blast_mode}}/lambda/out_{bin_id}.m8", bin_id = bin_ids)
+        lambda_out = "results/er_{er}/{blast_mode}/lambda/search_out.m8"
     output:
         out = "results/er_{er}/{blast_mode}/lambda/results.txt"
     script:
@@ -35,8 +50,8 @@ rule setup_time_benchmarks:
         for out in output:
             if "sparse" in out:
                 with open(out, "w") as f:
-                    f.write("time\tmem\terror-code\tcommand\tblast-mode\terror-rate\tbin-id\n")
+                    f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\tbin-id\n")
             else:
                 with open(out, "w") as f:
-                    f.write("time\tmem\terror-code\tcommand\tblast-mode\terror-rate\n")
+                    f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\n")
 

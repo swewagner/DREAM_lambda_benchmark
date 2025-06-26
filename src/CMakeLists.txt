@@ -24,3 +24,7 @@ target_link_libraries ("translate_ref" "common_interface")
 # build app distribute_matches with seqan3
 add_executable ("distribute_matches" distribute_matches.cpp)
 target_link_libraries ("distribute_matches" "common_interface")
+
+# build app distribute_matches_prot with seqan3
+add_executable ("distribute_matches_prot" distribute_matches_prot.cpp)
+target_link_libraries ("distribute_matches_prot" "common_interface")
