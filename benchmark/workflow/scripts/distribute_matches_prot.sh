@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+#set -ex
 
 IN_FILE_Q=$1
 IN_FILE_R=$2

@@ -25,6 +25,8 @@ rule distribute_matches_nuc:
         refs = expand("results/er_{{er}}/nuc/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
     params:
         outdir = "results/er_{er}/nuc/bins"
+    log:
+        "logs/simulation/{er}/log_distribute_nuc.log"
     shell:
         "./workflow/scripts/distribute_matches.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er}"
 

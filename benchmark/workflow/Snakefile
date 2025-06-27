@@ -1,3 +1,5 @@
+import os
+
 # config file given when running snakemake
 query_read_len = config["query_read_length"]
 ref_seq_len = config["ref_seq_length"]
@@ -7,12 +9,24 @@ num_of_refseqs = config["num_of_refseqs"]
 num_of_bins = config["num_of_bins"]
 
 
-error_rates = [0, 0.025, 0.05, 0.075, 0.1]
+error_rates = [0, 0.025] #[0, 0.025, 0.05, 0.075, 0.1]
 bins = list(range(num_of_bins))
 bin_ids = [str(x) for x in bins]
 domains = ["nuc", "prot"]
-blast_modes = ["blastN", "tBlastN", "blastX", "blastP"]
+blast_modes = ["blastN", "blastP"] #["blastN", "tBlastN", "blastX", "blastP"]
 benchmark_file_names = ["lambda_index", "lambda_search", "lambda_sparse_index", "lambda_sparse_search", "iota"]
+
+if not os.path.exists("benchmarks"):
+    os.mkdir("benchmarks")
+
+    for name in benchmark_file_names:
+        path = "benchmarks/" + name + ".time"
+        if "sparse" in path:
+            with open(path, "w") as f:
+                f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\tbin-id\n")
+        else:
+            with open(path, "w") as f:
+                f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\n")
 
 def getQueryDomain(wildcards):
     if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "blastX":
@@ -28,8 +42,9 @@ rule all:
         #ref_seqs = expand("results/er_{er}/{domain}/ref_seqs.fasta", er=error_rates, domain=domains),
         #iota = expand("results/er_{er}/{blast_mode}/iota/results.txt", er=error_rates, blast_mode=blast_modes)
         #lambda_combined = expand("results/er_{er}/{blast_mode}/lambda/search_out.m8", er=error_rates, blast_mode=blast_modes)
-        #sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt", er=error_rates, blast_mode=blast_modes)
-        trues = expand("results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt", er=error_rates, blast_mode=blast_modes)
+        trues = expand("results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt", er=error_rates, blast_mode=blast_modes),
+        trues_iota = expand("results/er_{er}/{blast_mode}/benchmark/iota_groundtruth.txt", er=error_rates, blast_mode=blast_modes),
+        lambda_sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt", er=error_rates, blast_mode=blast_modes)
 
 
 #include: "rules/simulate.smk"

@@ -8,12 +8,14 @@ LOG_FILE=$4
 DUMMY_FILE=$5
 BINARY_DIR="../build/iota"
 
-$BINARY_DIR/ibf_magic -r $BIN_FILE \
-                        -q $QUERY_FILE \
-                        -o $OUT_DIR \
+$BINARY_DIR/ibf_magic --reference $BIN_FILE \
+                        --query $QUERY_FILE \
+                        --output_dir $OUT_DIR \
+                        --kmer_size 12 \
+                        --bin_threshold 0.7 \
                         protein \
-                        -S auto \
-                        -Q auto \
+                        --subject_domain auto \
+                        --query_domain auto \
                         &> $LOG_FILE
 
 touch $DUMMY_FILE

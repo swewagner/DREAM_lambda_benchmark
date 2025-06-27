@@ -1,5 +1,5 @@
 def getGroundTruthDomain(wildcards):
-    if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "tblastN":
+    if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "tBlastN":
         return "results/er_{er}/nuc/ground_truth.txt"
     else:
         return "results/er_{er}/prot/ground_truth.txt"
@@ -42,16 +42,4 @@ rule compare_iota_lambda:
         "../scripts/compare_iota_lambda.py"
 
 
-rule setup_time_benchmarks:
-    output:
-        expand("benchmarks/{name}.time", name=benchmark_file_names)
-    run:
-        shell("mkdir -p benchmarks")
-        for out in output:
-            if "sparse" in out:
-                with open(out, "w") as f:
-                    f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\tbin-id\n")
-            else:
-                with open(out, "w") as f:
-                    f.write("time\tmem\terror-code\tcommand\terror-rate\tblast-mode\n")
 

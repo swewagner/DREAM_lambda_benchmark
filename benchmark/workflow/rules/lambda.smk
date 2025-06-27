@@ -96,7 +96,7 @@ rule make_index_sparse:
         
 def getQueryForSparseLambda(wildcards):
     if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "blastX":
-        query = "results/er_{er}/{blast_mode}/iota/queries_bin_{sparse_id}.fasta"
+        query = "results/er_{er}/{blast_mode}/iota/queries_nuc_bin_{sparse_id}.fasta"
     else:
         query = "results/er_{er}/{blast_mode}/iota/queries_prot_bin_{sparse_id}.fasta"
     return query
@@ -123,4 +123,4 @@ rule extract_lambda_results_sparse:
     output:
         out = "results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt"
     script:
-        "../scripts/lambda_summary.py"
+        "../scripts/lambda_summary_sparse.py"

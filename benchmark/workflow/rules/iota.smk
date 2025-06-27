@@ -58,11 +58,11 @@ checkpoint extract_iota_results:
 def get_sparse_ids(wildcards):
     co = checkpoints.extract_iota_results.get(**wildcards).output.results
     if wildcards.blast_mode == "blastN" or wildcards.blast_mode == "blastX":
-        sparse_ids = glob_wildcards(os.path.join(os.path.dirname(co), "queries_bin_{sparse_id}.fasta")).sparse_id
+        sparse_ids = glob_wildcards(os.path.join(os.path.dirname(co), "queries_nuc_bin_{sparse_id}.fasta")).sparse_id
     else:
         sparse_ids = glob_wildcards(os.path.join(os.path.dirname(co), "queries_prot_bin_{sparse_id}.fasta")).sparse_id
     return expand(
-        "results/er_{er}/{blast_mode}/lambda/sparse_out/out_{sparse_id}.m8",
+        "results/er_{{er}}/{{blast_mode}}/lambda/sparse_out/out_{sparse_id}.m8",
         er = wildcards.er,
         blast_mode = wildcards.blast_mode,
         sparse_id = sparse_ids
