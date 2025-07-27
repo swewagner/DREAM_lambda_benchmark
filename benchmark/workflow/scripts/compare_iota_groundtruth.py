@@ -5,8 +5,17 @@ results_file = snakemake.input[1]
 #gt_file = "../../results/er_0.025/ground_truth.txt"
 #results_file = "../../results/er_0.025/blastN/iota/results.txt"
 
+blast_to_frame = {"blastN": 2, "blastP": 1, "blastX": 6, "tBlastN":6}
+
+qseq_num = int(snakemake.config["num_of_qseqs"])
+bin_num = int(snakemake.config["num_of_bins"])
+frame_num = blast_to_frame[snakemake.wildcards.blast_mode]
+
+num_of_possible_matches = qseq_num * bin_num * frame_num
+
 
 gt_dic = {}
+num_actual_matches = 0
 TP = 0
 FP = 0
 FN = 0
@@ -20,6 +29,9 @@ with open(gt_file) as gt:
         else:
             row = list(map(int, row))
             gt_dic.setdefault(row[0], set()).add(row[2])
+
+for elem in gt_dic:
+    num_actual_matches += len(gt_dic[elem])
 
 with open(results_file) as res:
     for line in res:
@@ -44,7 +56,9 @@ with open(results_file) as res:
 for elem in gt_dic:
     FN += len(gt_dic[elem])
 
+TN = num_of_possible_matches - num_actual_matches - FP
+
 #print("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))
 
 with open(snakemake.output[0], 'w') as out_file:
-    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))
+    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN))

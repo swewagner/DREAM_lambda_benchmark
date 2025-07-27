@@ -3,7 +3,16 @@ import csv
 lambda_gt = snakemake.input[0]
 iota_file = snakemake.input[1]
 
+blast_to_frame = {"blastN": 2, "blastP": 1, "blastX": 6, "tBlastN":6}
+
+qseq_num = int(snakemake.config["num_of_qseqs"])
+bin_num = int(snakemake.config["num_of_bins"])
+frame_num = blast_to_frame[snakemake.wildcards.blast_mode]
+
+num_of_possible_matches = qseq_num * bin_num * frame_num
+
 gt_dic = {}
+num_actual_matches = 0
 TP = 0
 FP = 0
 FN = 0
@@ -18,6 +27,9 @@ with open(lambda_gt) as lf:
             row = list(map(int, row))
             # row[0] = bin_id, row[1] = ref_id, row[2] = query_id
             gt_dic.setdefault(row[0], set()).add(row[2])
+
+for elem in gt_dic:
+    num_actual_matches += len(gt_dic[elem])
 
 with open(iota_file) as res:
     for line in res:
@@ -42,5 +54,7 @@ with open(iota_file) as res:
 for elem in gt_dic:
     FN += len(gt_dic[elem])
 
+TN = num_of_possible_matches - num_actual_matches - FP
+
 with open(snakemake.output[0], 'w') as out_file:
-    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))
+    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN))
