@@ -1,14 +1,9 @@
 # in bases
 query_read_length: 300
 ref_seq_length: 9999
-match_length: 100
+match_length: 60
 
-num_of_qseqs: 10
-num_of_refseqs: 100
-num_of_bins: 32
-
-# valik parameters
-window_size: 12
-kmer_size: 10
-index_size: 1000k
-pattern_size: 14
+# qseqs must be < bins/2
+num_of_qseqs: 30
+num_of_refseqs: 1000
+num_of_bins: 64

@@ -7,9 +7,9 @@ def getGroundTruthDomain(wildcards):
 rule compare_iota_groundtruth:
     input:
         ground_truth = getGroundTruthDomain,
-        iota_results = "results/er_{er}/{blast_mode}/iota/results.txt"
+        iota_results = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}/results.txt"
     output:
-        out = "results/er_{er}/{blast_mode}/benchmark/iota_groundtruth.txt"
+        out = "results/er_{er}/{blast_mode}/benchmark/kmer{kmer}_error{error}/iota_groundtruth.txt"
     script:
         "../scripts/compare_iota_groundtruth.py"
 
@@ -18,7 +18,8 @@ rule compare_lambda_groundtruth:
         ground_truth = getGroundTruthDomain,
         lambda_results = "results/er_{er}/{blast_mode}/lambda/results.txt"
     output:
-        out = "results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt"
+        out = "results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt",
+        l_gt = "results/er_{er}/{blast_mode}/benchmark/lambda_as_groundtruth.txt"
     script:
         "../scripts/compare_lambda_groundtruth.py"
 
@@ -34,10 +35,10 @@ rule extract_lambda_results:
 
 rule compare_iota_lambda:
     input:
-        lambda_res = "results/er_{er}/{blast_mode}/lambda/results.txt",
-        iota_res = "results/er_{er}/{blast_mode}/iota/results.txt"
+        lambda_gt = "results/er_{er}/{blast_mode}/benchmark/lambda_as_groundtruth.txt",
+        iota_res = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}/results.txt"
     output:
-        out = "results/er_{er}/{blast_mode}/benchmark/iota_lambda.txt"
+        out = "results/er_{er}/{blast_mode}/benchmark/kmer{kmer}_error{error}/iota_lambda.txt"
     script:
         "../scripts/compare_iota_lambda.py"
 

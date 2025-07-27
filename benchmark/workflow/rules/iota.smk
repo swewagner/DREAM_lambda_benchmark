@@ -9,21 +9,23 @@ rule run_iota:
         bin_paths = getBinDomain,
         query = getQueryDomain
     output:
-        "results/er_{er}/{blast_mode}/iota/dummy.txt"
+        "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}/dummy.txt"
     log:
-        "logs/iota/er_{er}/{blast_mode}.log"
+        "logs/iota/er_{er}/{blast_mode}/kmer{kmer}_error{error}.log"
+    threads:
+        workflow.cores
     params:
-        out_dir = "results/er_{er}/{blast_mode}/iota",
+        out_dir = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}",
         binary_dir = "../build/iota",
         bench = "benchmarks/iota.time"
     shell:
         """
         if [ {wildcards.blast_mode} = "blastN" ]; then
             /usr/bin/time -a -o {params.bench} -f "%e\t%M\t%x\tiota\t{wildcards.er}\t{wildcards.blast_mode}" \
-            ./workflow/scripts/run_iota_nuc.sh {input.bin_paths} {input.query} {params.out_dir} {log} {output}
+            ./workflow/scripts/run_iota_nuc.sh {input.bin_paths} {input.query} {params.out_dir} {wildcards.kmer} {wildcards.error} {log} {output}
         else
             /usr/bin/time -a -o {params.bench} -f "%e\t%M\t%x\tiota\t{wildcards.er}\t{wildcards.blast_mode}" \
-            ./workflow/scripts/run_iota_prot.sh {input.bin_paths} {input.query} {params.out_dir} {log} {output}
+            ./workflow/scripts/run_iota_prot.sh {input.bin_paths} {input.query} {params.out_dir} {wildcards.kmer} {wildcards.error} {log} {output}
         fi
         """
 
@@ -47,9 +49,9 @@ rule run_iota:
 
 checkpoint extract_iota_results:
     input:
-        dummy = "results/er_{er}/{blast_mode}/iota/dummy.txt"
+        dummy = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}/dummy.txt"
     output:
-        results = "results/er_{er}/{blast_mode}/iota/results.txt"
+        results = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}/results.txt"
     conda:
         "../envs/python.yaml"
     script:

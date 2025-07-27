@@ -1,4 +1,6 @@
-lambda_file = snakemake.input[0]
+import csv
+
+lambda_gt = snakemake.input[0]
 iota_file = snakemake.input[1]
 
 gt_dic = {}
@@ -6,10 +8,16 @@ TP = 0
 FP = 0
 FN = 0
 
-with open(lambda_file) as lf:
-    for line in lf:
-        row = line.rstrip('\n').split(',')
-        gt_dic[int(row[0])] = set(list(map(int,row[1:])))
+with open(lambda_gt) as lf:
+    csv_reader = csv.reader(lf, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            line_count += 1
+        else:
+            row = list(map(int, row))
+            # row[0] = bin_id, row[1] = ref_id, row[2] = query_id
+            gt_dic.setdefault(row[0], set()).add(row[2])
 
 with open(iota_file) as res:
     for line in res:
