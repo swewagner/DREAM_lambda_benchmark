@@ -1,7 +1,7 @@
 benchmark/.snakemake
-benchmark/results/*
+benchmark/results*/*
 benchmark/logs/*
-benchmark/benchmarks/*
+benchmark/benchmarks*/*
 
 build/*
 build_old/*

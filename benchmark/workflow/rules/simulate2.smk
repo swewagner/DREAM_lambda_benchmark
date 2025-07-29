@@ -5,15 +5,19 @@
 rule simulate_ref_nuc:
     output:
         ref = "results/pre_ref_seqs_nuc.fasta"
+    log:
+        "logs/simulation/simulate_ref_nuc.log"
     shell:
-        "./workflow/scripts/simulate_seq.sh {output.ref} {num_of_refseqs} {ref_seq_len}"
+        "./workflow/scripts/simulate_seq.sh {output.ref} {num_of_refseqs} {ref_seq_len} {log}"
 
 
 rule simulate_query_nuc:
     output:
         queries = "results/queries_nuc.fasta"
+    log:
+        "logs/simulation/simulate_ref_nuc.log"
     shell:
-        "./workflow/scripts/simulate_seq.sh {output.queries} {num_of_qseqs} {query_read_len}"
+        "./workflow/scripts/simulate_seq.sh {output.queries} {num_of_qseqs} {query_read_len} {log}"
 
 
 rule distribute_matches_nuc:
@@ -26,9 +30,9 @@ rule distribute_matches_nuc:
     params:
         outdir = "results/er_{er}/nuc/bins"
     log:
-        "logs/simulation/{er}/log_distribute_nuc.log"
+        "logs/simulation/{er}_distribute_nuc.log"
     shell:
-        "./workflow/scripts/distribute_matches.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er}"
+        "./workflow/scripts/distribute_matches.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er} {log}"
 
 
 # -------------------------------
@@ -58,10 +62,12 @@ rule distribute_matches_prot:
     output:
         ground_truth = "results/er_{er}/prot/ground_truth.txt",
         refs = expand("results/er_{{er}}/prot/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
+    log:
+        "logs/simulation/{er}_distribute_prot.log"
     params:
         outdir = "results/er_{er}/prot/bins"
     shell:
-        "./workflow/scripts/distribute_matches_prot.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er}"
+        "./workflow/scripts/distribute_matches_prot.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er} {log}"
 
 
 rule create_all_bin_paths:

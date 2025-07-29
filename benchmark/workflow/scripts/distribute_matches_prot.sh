@@ -9,6 +9,7 @@ MATCH_LEN=$5
 R_NUM=$6
 B_NUM=$7
 ERR_RATE=$8
+LOG_FILE=$9
 BINARY_DIR="../build/bin"
 mkdir -p $OUT_DIR
 
@@ -21,4 +22,4 @@ $BINARY_DIR/distribute_matches_prot --in_queries $IN_FILE_Q \
                                --num_of_references $R_NUM \
                                --max_error_rate $ERR_RATE \
                                --verbose-ids
-                               &> /dev/null
+                               &> $LOG_FILE

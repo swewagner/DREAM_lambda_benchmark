@@ -1,9 +1,9 @@
 # in bases
-query_read_length: 300
+query_read_length: 390
 ref_seq_length: 9999
-match_length: 60
+match_length: 120
 
 # qseqs must be < bins/2
-num_of_qseqs: 30
-num_of_refseqs: 1000
-num_of_bins: 64
+num_of_qseqs: 100
+num_of_refseqs: 10000
+num_of_bins: 512

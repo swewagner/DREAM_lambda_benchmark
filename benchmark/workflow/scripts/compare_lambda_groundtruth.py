@@ -1,17 +1,33 @@
 import csv
+import math
 
 gt_file = snakemake.input[0]
 results_file = snakemake.input[1]
 #gt_file = "../../results/er_0/prot/ground_truth.txt"
 #results_file = "../../results/er_0/blastP/lambda/results.txt"
 
+bin_num = int(snakemake.config["num_of_bins"])
+ref_num = int(snakemake.config["num_of_refseqs"])
+num_fuller_bins = ref_num % bin_num
+num_refs_in_lesser_bin = (ref_num // bin_num)
+num_refs_in_full_bin = (ref_num // bin_num)+1
+num_refs_in_fuller_bins = num_fuller_bins * num_refs_in_full_bin
+
+def ref_to_bin(ref_id):
+    if (ref_id <= num_refs_in_fuller_bins):
+        bin_id = math.ceil(ref_id / num_refs_in_full_bin) -1
+    else:
+        pos_in_lesser_bins = ref_id - num_refs_in_fuller_bins
+        lesser_bin_id = math.ceil(pos_in_lesser_bins / num_refs_in_lesser_bin)-1
+        bin_id = num_fuller_bins + lesser_bin_id
+    return bin_id
 
 gt_dic = {}
 TP = 0
 FP = 0
 FN = 0
-ref_to_bin = {}
 lambda_gt = []
+
 
 with open(gt_file) as gt:
     csv_reader = csv.reader(gt, delimiter=',')
@@ -23,7 +39,6 @@ with open(gt_file) as gt:
             row = list(map(int, row))
             # row[1] = ref_id, row[2] = query_id, row[0] = bin_id
             gt_dic.setdefault(row[1], set()).add(row[2])
-            ref_to_bin[row[1]] = row[0]
 
 #print("gt: ", gt_dic)
 
@@ -35,7 +50,7 @@ with open(results_file) as res:
             #hit[0] = ref_id
             #hit[i] = qry_id(s)
             #prepare lambda_as_gt: bin, ref, qry
-            lambda_gt.append([ref_to_bin[hit[0]], hit[0], hit[i]])
+            lambda_gt.append([ref_to_bin(hit[0]), hit[0], hit[i]])
             # check FP
             if hit[0] in gt_dic:
                 if hit[i] in gt_dic[hit[0]]:

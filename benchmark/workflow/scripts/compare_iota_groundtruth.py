@@ -19,6 +19,8 @@ num_actual_matches = 0
 TP = 0
 FP = 0
 FN = 0
+bins_with_hit = 0
+bins_with_true_hit = 0
 
 with open(gt_file) as gt:
     csv_reader = csv.reader(gt, delimiter=',')
@@ -31,10 +33,12 @@ with open(gt_file) as gt:
             gt_dic.setdefault(row[0], set()).add(row[2])
 
 for elem in gt_dic:
+    bins_with_true_hit +=1
     num_actual_matches += len(gt_dic[elem])
 
 with open(results_file) as res:
     for line in res:
+        bins_with_hit += 1
         hit = line.rstrip('\n').split(',')
         hit = list(map(int, hit))
         for i in range(1,len(hit)):
@@ -61,4 +65,4 @@ TN = num_of_possible_matches - num_actual_matches - FP
 #print("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))
 
 with open(snakemake.output[0], 'w') as out_file:
-    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN))
+    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN) + " BTM: "+ str(bins_with_true_hit) + " B: " + str(bins_with_hit))

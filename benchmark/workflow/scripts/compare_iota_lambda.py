@@ -16,6 +16,8 @@ num_actual_matches = 0
 TP = 0
 FP = 0
 FN = 0
+bins_with_hit = 0
+bins_with_true_hit = 0
 
 with open(lambda_gt) as lf:
     csv_reader = csv.reader(lf, delimiter=',')
@@ -29,10 +31,12 @@ with open(lambda_gt) as lf:
             gt_dic.setdefault(row[0], set()).add(row[2])
 
 for elem in gt_dic:
+    bins_with_true_hit +=1
     num_actual_matches += len(gt_dic[elem])
 
 with open(iota_file) as res:
     for line in res:
+        bins_with_hit += 1
         hit = line.rstrip('\n').split(',')
         hit = list(map(int, hit))
         for i in range(1,len(hit)):
@@ -57,4 +61,4 @@ for elem in gt_dic:
 TN = num_of_possible_matches - num_actual_matches - FP
 
 with open(snakemake.output[0], 'w') as out_file:
-    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN))
+    out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN) + " BTM: "+ str(bins_with_true_hit) + " B: " + str(bins_with_hit))

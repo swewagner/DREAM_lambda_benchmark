@@ -15,7 +15,6 @@ $BINARY_DIR/ibf_magic -r $BIN_FILE \
                         -o $OUT_DIR \
                         --kmer_size $K_MER \
                         --max_error $MAX_ER \
-                        -t 0.2 \
                         nucleotide \
                         -M 2 \
                         &> $LOG_FILE

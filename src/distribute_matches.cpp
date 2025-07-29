@@ -170,14 +170,15 @@ void run_program(cmd_arguments const & args)
             //insert twice to same seq
             std::uniform_int_distribution<uint64_t> insert_start_dis1(0, std::ranges::size(bins[idx][0].sequence())/2 - args.match_len);
             uint64_t insert_start_pos = insert_start_dis1(gen);
+            uint64_t insert_start_pos2 = std::ranges::size(bins[idx][0].sequence())/2 + insert_start_pos;
             int bin_id = nums[idx];
             std::vector<seqan3::dna4> seq_pre = bins[bin_id][0].sequence() |
                                                 seqan3::views::slice(0, insert_start_pos) | seqan3::ranges::to<std::vector>();
             std::vector<seqan3::dna4> seq_mid = bins[bin_id][0].sequence() |
-                                                seqan3::views::slice(insert_start_pos + args.match_len, insert_start_pos + insert_start_pos) |
+                                                seqan3::views::slice(insert_start_pos + args.match_len, insert_start_pos2) |
                                                 seqan3::ranges::to<std::vector>();
             std::vector<seqan3::dna4> seq_suf = bins[bin_id][0].sequence() |
-                                                seqan3::views::slice(insert_start_pos + insert_start_pos + args.match_len, std::ranges::size(bins[bin_id][0].sequence())) | seqan3::ranges::to<std::vector>();
+                                                seqan3::views::slice(insert_start_pos2 + args.match_len, std::ranges::size(bins[bin_id][0].sequence())) | seqan3::ranges::to<std::vector>();
             std::vector<std::vector<seqan3::dna4>> v{ seq_pre, match, seq_mid, match, seq_suf };
             std::vector<seqan3::dna4> new_seq = std::ranges::join_view(v) |
                                                 seqan3::ranges::to<std::vector>();
@@ -199,7 +200,7 @@ void run_program(cmd_arguments const & args)
                 bins[bin_id][0].id(), // ref_id
                 id, // query_id
                 args.match_len, // match_len
-                insert_start_pos+insert_start_pos, // start_pos_in_ref
+                insert_start_pos2, // start_pos_in_ref
                 match_start_pos // start_pos_in_query
             };
             match_infos.push_back(mi);
