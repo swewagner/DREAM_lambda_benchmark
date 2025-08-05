@@ -10,13 +10,13 @@ num_of_bins = config["num_of_bins"]
 
 kmer_size = [12]
 max_error = [0]
-p_alphabet = ["murphy"]#["Dna4"]#
+p_alphabet = ["murphy"]#["Dna4"]#["li"]
 
 error_rates = [0.025] #[0, 0.025, 0.05, 0.075, 0.1]
 bins = list(range(num_of_bins))
 bin_ids = [str(x) for x in bins]
-domains = ["nuc", "prot"]#["nuc"]#
-blast_modes = ["blastX"]#["blastP", "blastX"]#["blastN"]#["blastN", "blastN", "tBlastN", "blastP"]
+domains = ["nuc", "prot"]
+blast_modes = ["blastX"]#["blastN", "tBlastN", "blastP"]
 
 benchmark_file_names = ["lambda_index", "lambda_search", "lambda_sparse_index", "lambda_sparse_search", "iota"]
 
@@ -52,9 +52,7 @@ rule all:
         lambda_sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/kmer{kmer}_error{error}_alphabet{alph}/results.txt", er=error_rates, blast_mode=blast_modes, kmer=kmer_size, error=max_error, alph=p_alphabet)
 
 
-#include: "rules/simulate.smk"
-#include: "rules/valik.smk"
-include: "rules/simulate2.smk"
+include: "rules/simulate.smk"
 include: "rules/iota.smk"
 include: "rules/lambda.smk"
 include: "rules/benchmark.smk"

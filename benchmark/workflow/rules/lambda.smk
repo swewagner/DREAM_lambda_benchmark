@@ -48,31 +48,6 @@ rule search:
         fi
         """
 
-
-# lambda without prefilter, but on each bin
-
-# rule make_index_bins:
-#     input:
-#         db = "results/er_{er}/bins/bin_{bin_id}.fasta"
-#     output:
-#         index = "results/er_{er}/{blast_mode}/lambda/dbs/db_{bin_id}.lba"
-#     log:
-#         "logs/lambda/index/{er}/{blast_mode}/log_{bin_id}.log"
-#     shell:
-#         "./workflow/scripts/lambda_index.sh {input.db} {output.index} {wildcards.blast_mode} {log}"
-
-
-# rule search_bins:
-#     input:
-#         query = "results/queries.fasta",
-#         index = "results/er_{er}/{blast_mode}/lambda/dbs/db_{bin_id}.lba"
-#     output:
-#         "results/er_{er}/{blast_mode}/lambda/out_{bin_id}.m8"
-#     log:
-#         "logs/lambda/search/{er}/{blast_mode}/log_{bin_id}.log"
-#     shell:
-#         "./workflow/scripts/lambda_search.sh {input.query} {input.index} {output} {wildcards.blast_mode} {log}"
-
 def getSbjDomainSparse(wildcards):
     if wildcards.blast_mode == "blastN":
         return "results/er_{er}/nuc/bins/bin_{sparse_id}.fasta"

@@ -29,24 +29,6 @@ rule run_iota:
         fi
         """
 
-# rule run_iota_tBlastN:
-#     input:
-#         bin_paths = "results/er_{er}/all_bin_paths.txt",
-#         prot_query = "results/queries_prot.fasta",
-#         bench = "benchmarks/iota.time"
-#     output:
-#         "results/er_{er}/tBlastN/iota/dummy.txt"
-#     log:
-#         "logs/iota/er_{er}/tBlastN.log"
-#     params:
-#         out_dir = "results/er_{er}/tBlastN/iota"
-#     shell:
-#         """
-#         /usr/bin/time -a -o {input.bench} -f "%e\t%M\t%x\tiota\ttBlastN\t{wildcards.er}" \
-#         ./workflow/scripts/run_iota_tBlastN.sh {input.bin_paths} {input.prot_query} {params.out_dir} {log} {output}
-#         """
-
-
 checkpoint extract_iota_results:
     input:
         dummy = "results/er_{er}/{blast_mode}/iota/kmer{kmer}_error{error}_alphabet{alph}/dummy.txt"

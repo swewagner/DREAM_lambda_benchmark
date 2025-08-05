@@ -1,85 +1,101 @@
-rule simulate_ref_dna:
+# -------------------------------
+# simulate dna sequences
+# -------------------------------
+
+rule simulate_ref_nuc:
     output:
-        ref = "results/ref_seqs_dna.fasta"
+        ref = "results/pre_ref_seqs_nuc.fasta"
+    log:
+        "logs/simulation/simulate_ref_nuc.log"
     shell:
-        "./workflow/scripts/simulate_seq.sh {output.ref} {num_of_refseqs} {ref_seq_len}"
+        "./workflow/scripts/simulate_seq.sh {output.ref} {num_of_refseqs} {ref_seq_len} {log}"
 
 
-rule simulate_query_pre:
+rule simulate_query_nuc:
     output:
-        queries = "results/pre_queries.fasta"
+        queries = "results/queries_nuc.fasta"
+    log:
+        "logs/simulation/simulate_ref_nuc.log"
     shell:
-        "./workflow/scripts/simulate_seq.sh {output.queries} {num_of_qseqs} {query_read_len}"
+        "./workflow/scripts/simulate_seq.sh {output.queries} {num_of_qseqs} {query_read_len} {log}"
 
 
-rule simulate_matches:
+rule distribute_matches_nuc:
     input:
-        ref = "results/ref_seqs_dna.fasta",
+        queries = "results/queries_nuc.fasta",
+        pre_refs = "results/pre_ref_seqs_nuc.fasta"
     output:
-        matches = "results/er_{er}/matches.fasta",
-        ground_truth = "results/er_{er}/ground_truth.txt"
+        ground_truth = "results/er_{er}/nuc/ground_truth.txt",
+        refs = expand("results/er_{{er}}/nuc/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
+    params:
+        outdir = "results/er_{er}/nuc/bins"
+    log:
+        "logs/simulation/{er}_distribute_nuc.log"
     shell:
-        "./workflow/scripts/simulate_matches.sh {input.ref} {output.matches} {output.ground_truth} {num_of_qseqs} {match_len} {num_of_refseqs} {wildcards.er}"
+        "./workflow/scripts/distribute_matches.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er} {log}"
 
 
-rule insert_matches:
+# -------------------------------
+# translate to prot sequences
+# -------------------------------
+
+rule translate_qry:
     input:
-        queries = "results/pre_queries.fasta",
-        matches = "results/er_{er}/matches.fasta"
+        dna = "results/queries_nuc.fasta"
     output:
-        "results/er_{er}/final_queries_linebreaks.fasta"
-    shell:
-        "./workflow/scripts/insert_matches.sh {input.queries} {input.matches} {output}"
-
-
-rule remove_linebreaks:
-    input:
-        queries = "results/er_{er}/final_queries_linebreaks.fasta"
-    output:
-        "results/er_{er}/final_queries.fasta"
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/remove_linebreaks.py"
-
-
-rule translate_ref:
-    input:
-        dna = "results/ref_seqs_dna.fasta"
-    output:
-        prot = "results/ref_seqs_prot_linebreaks.fasta"
+        prot = "results/queries_prot.fasta"
     shell:
         "./workflow/scripts/translate_ref.sh {input.dna} {output.prot}"
 
-
-rule remove_linebreaks_prot:
+rule translate_ref:
     input:
-        "results/ref_seqs_prot_linebreaks.fasta"
+        dna = "results/pre_ref_seqs_nuc.fasta"
     output:
-        "results/ref_seqs_prot.fasta"
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/remove_linebreaks.py"
+        prot = "results/pre_ref_seqs_prot.fasta"
+    shell:
+        "./workflow/scripts/translate_ref.sh {input.dna} {output.prot}"
 
-
-rule split_into_bins:
+rule distribute_matches_prot:
     input:
-        ref = "results/ref_seqs_dna.fasta"
+        queries = "results/queries_prot.fasta",
+        pre_refs = "results/pre_ref_seqs_prot.fasta"
     output:
-        bins = expand("results/bins/bin_{bin_id}_linebreaks.fasta", bin_id=bin_ids)
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/split_into_bins.py"
+        ground_truth = "results/er_{er}/prot/ground_truth.txt",
+        refs = expand("results/er_{{er}}/prot/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
+    log:
+        "logs/simulation/{er}_distribute_prot.log"
+    params:
+        outdir = "results/er_{er}/prot/bins"
+    shell:
+        "./workflow/scripts/distribute_matches_prot.sh {input.queries} {input.pre_refs} {output.ground_truth} {params.outdir} {match_len} {num_of_refseqs} {num_of_bins} {wildcards.er} {log}"
 
 
-rule remove_linebreaks_in_bins:
+rule create_all_bin_paths:
     input:
-        bins = "results/bins/bin_{bin_id}_linebreaks.fasta"
+        refs = expand("results/er_{{er}}/{{domain}}/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
     output:
-        bins_without_linebreaks = "results/bins/bin_{bin_id}.fasta"
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/remove_linebreaks.py"
+        bin_paths = "results/er_{er}/{domain}/all_bin_paths.txt"
+    params:
+        max_bin = num_of_bins-1,
+        bin_path = "bins/bin_",
+        ext = ".fasta"
+    shell:
+        """
+        for i in $(seq 0 {params.max_bin}); do
+            echo {params.bin_path}$i{params.ext} >> {output.bin_paths}
+        done
+        """
+
+rule combine_bins_into_one_file:
+    input:
+        expand("results/er_{{er}}/{{domain}}/bins/bin_{bin_id}.fasta", bin_id=bin_ids)
+    output:
+        combined_bins = "results/er_{er}/{domain}/ref_seqs.fasta"
+    params:
+        max_bin = num_of_bins-1,
+        bin_path = "results/er_{er}/{domain}/bins/bin_",
+        ext = ".fasta"
+    shell:
+        """
+        for i in $(seq 0 {params.max_bin}); do cat {params.bin_path}$i{params.ext} >> {output.combined_bins}; done
+        """
