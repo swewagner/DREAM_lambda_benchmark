@@ -11,8 +11,8 @@ BINARY_DIR="../build/lambda3/src/lambda3-build/bin"
 if [ $BLAST_M = "blastN" ]; then
 $BINARY_DIR/lambda3 searchn --query $QUERY_FILE \
                             --index $INDEX_FILE \
-                            --num-matches 2 \
+                            -v 2 \
                             --output $OUT_FILE &> $LOG_FILE
 else
-$BINARY_DIR/lambda3 searchp -q $QUERY_FILE -i $INDEX_FILE -o $OUT_FILE &> $LOG_FILE
+$BINARY_DIR/lambda3 searchp -q $QUERY_FILE -i $INDEX_FILE -o $OUT_FILE -v 2 &> $LOG_FILE
 fi

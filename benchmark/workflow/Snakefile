@@ -8,15 +8,15 @@ num_of_qseqs = config["num_of_qseqs"]
 num_of_refseqs = config["num_of_refseqs"]
 num_of_bins = config["num_of_bins"]
 
-kmer_size = [7,12]
+kmer_size = [12]
 max_error = [0]
-p_alphabet = ["li", "murphy"]
+p_alphabet = ["murphy"]#["Dna4"]#
 
-error_rates = [0] #[0, 0.025, 0.05, 0.075, 0.1]
+error_rates = [0.025] #[0, 0.025, 0.05, 0.075, 0.1]
 bins = list(range(num_of_bins))
 bin_ids = [str(x) for x in bins]
-domains = ["nuc", "prot"]
-blast_modes = ["blastP", "blastX", "tBlastN"] #["blastN", "blastN", "tBlastN", "blastP"]
+domains = ["nuc", "prot"]#["nuc"]#
+blast_modes = ["blastX"]#["blastP", "blastX"]#["blastN"]#["blastN", "blastN", "tBlastN", "blastP"]
 
 benchmark_file_names = ["lambda_index", "lambda_search", "lambda_sparse_index", "lambda_sparse_search", "iota"]
 
@@ -48,8 +48,8 @@ rule all:
         #lambda_combined = expand("results/er_{er}/{blast_mode}/lambda/search_out.m8", er=error_rates, blast_mode=blast_modes)
         trues = expand("results/er_{er}/{blast_mode}/benchmark/lambda_groundtruth.txt", er=error_rates, blast_mode=blast_modes),
         trues_iota = expand("results/er_{er}/{blast_mode}/benchmark/kmer{kmer}_error{error}_alphabet{alph}/iota_groundtruth.txt", er=error_rates, blast_mode=blast_modes, kmer=kmer_size, error=max_error, alph=p_alphabet),
-        trues_iota_lambda = expand("results/er_{er}/{blast_mode}/benchmark/kmer{kmer}_error{error}_alphabet{alph}/iota_lambda.txt", er=error_rates, blast_mode=blast_modes, kmer=kmer_size, error=max_error, alph=p_alphabet)
-        #lambda_sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/results.txt", er=error_rates, blast_mode=blast_modes)
+        trues_iota_lambda = expand("results/er_{er}/{blast_mode}/benchmark/kmer{kmer}_error{error}_alphabet{alph}/iota_lambda.txt", er=error_rates, blast_mode=blast_modes, kmer=kmer_size, error=max_error, alph=p_alphabet),
+        lambda_sparse = expand("results/er_{er}/{blast_mode}/lambda/sparse_out/kmer{kmer}_error{error}_alphabet{alph}/results.txt", er=error_rates, blast_mode=blast_modes, kmer=kmer_size, error=max_error, alph=p_alphabet)
 
 
 #include: "rules/simulate.smk"

@@ -38,3 +38,7 @@ rm -rf results/er_0.025/blastX/iota
 rm -rf results/er_0.025/blastX/lambda
 rm -rf results/er_0.025/tBlastN/iota
 rm -rf results/er_0.025/tBlastN/lambda
+
+rm -rf results/er_0.017/nuc
+rm -rf results/er_0.017/tBlastN/iota
+rm -rf results/er_0.017/tBlastN/lambda

@@ -64,7 +64,7 @@ def get_sparse_ids(wildcards):
     else:
         sparse_ids = glob_wildcards(os.path.join(os.path.dirname(co), "queries_prot_bin_{sparse_id}.fasta")).sparse_id
     return expand(
-        "results/er_{{er}}/{{blast_mode}}/lambda/sparse_out/out_{sparse_id}.m8",
+        "results/er_{{er}}/{{blast_mode}}/lambda/sparse_out/kmer{{kmer}}_error{{error}}_alphabet{{alph}}/out_{sparse_id}.m8",
         er = wildcards.er,
         blast_mode = wildcards.blast_mode,
         sparse_id = sparse_ids

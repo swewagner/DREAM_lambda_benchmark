@@ -4,6 +4,6 @@ ref_seq_length: 9999
 match_length: 120
 
 # qseqs must be < bins/2
-num_of_qseqs: 100
+num_of_qseqs: 1000
 num_of_refseqs: 10000
-num_of_bins: 512
+num_of_bins: 1024
