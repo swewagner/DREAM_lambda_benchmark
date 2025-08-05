@@ -40,7 +40,6 @@ with open(gt_file) as gt:
             # row[1] = ref_id, row[2] = query_id, row[0] = bin_id
             gt_dic.setdefault(row[1], set()).add(row[2])
 
-#print("gt: ", gt_dic)
 
 with open(results_file) as res:
     for line in res:
@@ -70,7 +69,6 @@ with open(results_file) as res:
 for elem in gt_dic:
     FN += len(gt_dic[elem])
 
-#print("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))
 
 with open(snakemake.output[0], 'w') as out_file:
     out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN))

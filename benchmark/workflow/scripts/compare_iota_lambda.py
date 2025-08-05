@@ -60,8 +60,12 @@ for elem in gt_dic:
 
 TN = num_of_possible_matches - num_actual_matches - FP
 
+tpr = "undefined"
+tnr = "undefined"
+if (TP+FN > 0):
+    tpr = TP / (TP+FN)
+if (TN+FP > 0):
+    tnr = TN / (TN+FP)
 
-tpr = TP / (TP+FN)
-tnr = TN / (TN+FP)
 with open(snakemake.output[0], 'w') as out_file:
     out_file.write("TP: " + str(TP) + " FP: " + str(FP) + " FN: " + str(FN) + " TN: " + str(TN) + " BTM: "+ str(bins_with_true_hit) + " B: " + str(bins_with_hit) + "\n" + "Sens: " + str(tpr) + " Spec: " + str(tnr))
