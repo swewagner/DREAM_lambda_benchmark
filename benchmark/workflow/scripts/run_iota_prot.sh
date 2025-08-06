@@ -11,16 +11,16 @@ LOG_FILE=$7
 DUMMY_FILE=$8
 BINARY_DIR="../build/iota"
 
-$BINARY_DIR/ibf_magic --reference $BIN_FILE \
-                        --query $QUERY_FILE \
-                        --output_dir $OUT_DIR \
-                        --kmer_size $K_MER \
-                        --max_error $MAX_ER \
-                        protein \
-                        --subject_domain auto \
-                        --query_domain auto \
-                        --reduced_alphabet $RED_ALPH \
-                        &> $LOG_FILE
+$BINARY_DIR/iota protein \
+                --reference $BIN_FILE \
+                --query $QUERY_FILE \
+                --output_dir $OUT_DIR \
+                --kmer_size $K_MER \
+                --max_error $MAX_ER \
+                --subject_domain auto \
+                --query_domain auto \
+                --reduced_alphabet $RED_ALPH \
+                &> $LOG_FILE
 
 touch $DUMMY_FILE
 for file in $(ls $OUT_DIR/*.fasta);

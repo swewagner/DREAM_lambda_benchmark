@@ -10,12 +10,12 @@ LOG_FILE=$6
 DUMMY_FILE=$7
 BINARY_DIR="../build/iota"
 
-$BINARY_DIR/ibf_magic -r $BIN_FILE \
+$BINARY_DIR/iota nucleotide \
+                        -r $BIN_FILE \
                         -q $QUERY_FILE \
                         -o $OUT_DIR \
                         --kmer_size $K_MER \
                         --max_error $MAX_ER \
-                        nucleotide \
                         -M 2 \
                         &> $LOG_FILE
 
